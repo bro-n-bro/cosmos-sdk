@@ -566,9 +566,16 @@ func (app *BaseApp) ApplySnapshotChunk(req abci.RequestApplySnapshotChunk) abci.
 }
 
 func (app *BaseApp) handleQueryGRPC(handler GRPCQueryHandler, req abci.RequestQuery) abci.ResponseQuery {
-	ctx, err := app.createQueryContext(req.Height, req.Prove)
-	if err != nil {
-		return sdkerrors.QueryResult(err)
+
+	var ctx sdk.Context
+	var err error
+	if req.Path == "/osmosis.gamm.v1beta1.Query/Pools" {
+		ctx = app.checkState.ctx
+	} else {
+		ctx, err = app.createQueryContext(req.Height, req.Prove)
+		if err != nil {
+			return sdkerrors.QueryResult(err)
+		}
 	}
 
 	res, err := handler(ctx, req)
@@ -721,7 +728,7 @@ func (app *BaseApp) GetBlockRetentionHeight(commitHeight int64) int64 {
 	}
 
 	if app.snapshotInterval > 0 && app.snapshotKeepRecent > 0 {
-		v := commitHeight - int64((app.snapshotInterval * uint64(app.snapshotKeepRecent)))
+		v := commitHeight - int64(app.snapshotInterval*uint64(app.snapshotKeepRecent))
 		retentionHeight = minNonZero(retentionHeight, v)
 	}
 
