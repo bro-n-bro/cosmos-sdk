@@ -19,3 +19,7 @@ func (st *state) CacheMultiStore() sdk.CacheMultiStore {
 func (st *state) Context() sdk.Context {
 	return st.ctx
 }
+
+func (st *state) SetContext(ctx sdk.Context) {
+	st.ctx = ctx
+}
