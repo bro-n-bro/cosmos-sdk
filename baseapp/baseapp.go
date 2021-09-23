@@ -691,8 +691,15 @@ func (app *BaseApp) runMsgs(ctx sdk.Context, msgs []sdk.Msg, mode runTxMode) (*s
 		Data: make([]*sdk.MsgData, 0, len(msgs)),
 	}
 
+	filter := ctx.Context().Value(MempoolExecMsgFilterKey)
 	// NOTE: GasWanted is determined by the AnteHandler and GasUsed by the GasMeter.
 	for i, msg := range msgs {
+		// skip actual execution for (Re)CheckTx mode
+		if mode == runTxModeCheck || mode == runTxModeReCheck {
+			if filter != nil && filter.(MempoolExecMsgFilter)(msg) {
+				break
+			}
+		}
 
 		var (
 			msgEvents sdk.Events
