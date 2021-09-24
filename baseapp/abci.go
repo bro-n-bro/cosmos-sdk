@@ -569,7 +569,7 @@ func (app *BaseApp) handleQueryGRPC(handler GRPCQueryHandler, req abci.RequestQu
 
 	var ctx sdk.Context
 	var err error
-	if req.Path == "/osmosis.gamm.v1beta1.Query/Pools" {
+	if req.Path == "/osmosis.gamm.v1beta1.Query/Pools" || req.Path == "/osmosis.gamm.v1beta1.Query/Profit" {
 		ctx = app.checkState.ctx
 	} else {
 		ctx, err = app.createQueryContext(req.Height, req.Prove)
